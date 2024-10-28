@@ -1,0 +1,20 @@
+@isTest
+private class BillingCalloutServiceTest {
+    @isTest static void testCallout() {
+        // This causes a fake response to be generated
+        Test.setMock(WebServiceMock.class, new BillingCalloutServiceMock());
+        //Create a test Accessibility Project(Accessibility_Project__c) record. 
+        Accessibility_Project__c testRecord = new Accessibility_Project__c(Amount__c = 50, Type__c = 'Sign Language Interpreters', Status__c = 'Submitted');
+        insert testRecord;
+        
+        // Call the method that invokes a callout
+        Test.startTest();
+        AccessibilityProjectBilling.callBillingService(testRecord.id, testRecord.Amount__c);
+        Test.stopTest();
+        //query the test record
+        testRecord = [SELECT Status__c FROM Accessibility_Project__c WHERE Id = :testRecord.Id];
+        // Verify that a fake result is returned
+        Assert.areEqual('Complete', testRecord.Status__c, 'The status should be updated to Complete.');
+    }
+    
+}
